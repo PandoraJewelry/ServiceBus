@@ -1,11 +1,12 @@
 {
-  "version": "1.0.0-*",
+  "version": "1.0.1-*",
   "description": "Utilities for making ServiceBus easier to work with.",
   "authors": [ "PandoraJewelry" ],
   "tags": [ "Azure", "ServiceBus" ],
   "projectUrl": "https://github.com/PandoraJewelry/ServiceBusExtensions",
   "licenseUrl": "https://github.com/PandoraJewelry/ServiceBusExtensions/blob/master/LICENSE",
   "frameworks": {
+    "net46": { },
     "net461": { }
   },
   "dependencies": {
