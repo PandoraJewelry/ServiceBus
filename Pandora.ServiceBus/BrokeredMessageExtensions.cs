@@ -1,10 +1,8 @@
 ﻿using Microsoft.ServiceBus.Messaging;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +16,6 @@ namespace Pandora.ServiceBusExtensions
         private const string JsonContentType = "application/json";
         private const string PlainTextType = "text/plain";
         #endregion
-
 
         #region process async
         public static async Task<bool> ProcessRequestAsync<T>(this BrokeredMessage message, Func<T, Task<bool>> callback)

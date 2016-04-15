@@ -1,4 +1,4 @@
-# ServiceBus Extensions
+# Azure ServiceBus Extensions
 
 ## Introduction
 
@@ -21,3 +21,8 @@ You can obtain it [through Nuget](https://www.nuget.org/packages/Pandora.Service
     Install-Package Pandora.ServiceBusExtensions
 
 Or **clone** this repo and reference it.
+
+### Historical Note
+
+This was our first foray into open sourcing projects. The project's internal name was **Pandora.ServiceBusExtensions** so we kept the name when we moved the code to [GitHub](https://github.com/PandoraJewelry/ServiceBus). After examining other similar projects we determined to rename the project to **Pandora.ServiceBus** to mimic the Microsoft's DLL name. We are maintaining the package name of **Pandora.ServiceBusExtensions** in difference to those already using it.
+

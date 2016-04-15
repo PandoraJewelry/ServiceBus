@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Pandora.ServiceBusExtensions</id>
+    <version>$version$</version>
+    <authors>$author$</authors>
+    <description>$description$</description>
+    <language>en-US</language>
+    <projectUrl>https://github.com/PandoraJewelry/ServiceBus/</projectUrl>
+    <licenseUrl>https://github.com/PandoraJewelry/ServiceBus/blob/master/LICENSE</licenseUrl>
+  </metadata>
+</package>
