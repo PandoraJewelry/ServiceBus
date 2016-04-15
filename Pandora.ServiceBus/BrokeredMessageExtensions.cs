@@ -1,4 +1,7 @@
-﻿using Microsoft.ServiceBus.Messaging;
+﻿// Copyright (c) PandoraJewelry. All rights reserved.
+// Licensed under the MIT License. See License in the project root for license information.
+
+using Microsoft.ServiceBus.Messaging;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
@@ -7,12 +10,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Pandora.ServiceBusExtensions
+namespace Pandora.ServiceBus
 {
     public static class BrokeredMessageExtensions
     {
         #region fields
-        private static TraceSource source = new TraceSource(typeof(BrokeredMessageExtensions).FullName, SourceLevels.Error);
+        private static TraceSource _trace = new TraceSource(Consts.TraceName, SourceLevels.Error);
         private const string JsonContentType = "application/json";
         private const string PlainTextType = "text/plain";
         #endregion
@@ -34,14 +37,14 @@ namespace Pandora.ServiceBusExtensions
             {
                 done = message.AutoRenew();
 
-                source.TraceEvent(TraceEventType.Verbose, 1, string.Format("Start of Deseralise ({0}) processing.", message.MessageId));
+                _trace.TraceEvent(TraceEventType.Verbose, 1, string.Format("Start of Deseralise ({0}) processing.", message.MessageId));
                 var t = await message.DeseraliseAsync<T>();
-                source.TraceEvent(TraceEventType.Verbose, 2, "End of Deseralise processing.");
+                _trace.TraceEvent(TraceEventType.Verbose, 2, "End of Deseralise processing.");
 
-                source.TraceEvent(TraceEventType.Verbose, 3, "Start of message processing.");
+                _trace.TraceEvent(TraceEventType.Verbose, 3, "Start of message processing.");
                 var result = await callback(t);
                 var success = await successdetect(result);
-                source.TraceEvent(TraceEventType.Verbose, 4, string.Format("End of message processing. {0}", success ? "Success" : "Errors Detected"));
+                _trace.TraceEvent(TraceEventType.Verbose, 4, string.Format("End of message processing. {0}", success ? "Success" : "Errors Detected"));
 
                 if (!success)
                     throw new ApplicationException("Process did not complete successfully");
@@ -51,7 +54,7 @@ namespace Pandora.ServiceBusExtensions
             catch (Exception ex)
             {
                 /// log errors
-                source.TraceEvent(TraceEventType.Error, 1, string.Format("ProcessRequest ({0}) - {1}", message.MessageId, ex));
+                _trace.TraceEvent(TraceEventType.Error, 1, string.Format("ProcessRequest ({0}) - {1}", message.MessageId, ex));
                 throw;
             }
             finally
@@ -77,7 +80,7 @@ namespace Pandora.ServiceBusExtensions
                     {
                         await Task.Delay(halflife, token.Token);
                         await message.RenewLockAsync();
-                        source.TraceEvent(TraceEventType.Verbose, 6, string.Format("AutoRenew message ({0}) lock - re-acquired", id));
+                        _trace.TraceEvent(TraceEventType.Verbose, 6, string.Format("AutoRenew message ({0}) lock - re-acquired", id));
                     }
                     catch (TaskCanceledException) { }
                     if (token.IsCancellationRequested)
@@ -88,7 +91,7 @@ namespace Pandora.ServiceBusExtensions
             return () =>
             {
                 token.Cancel();
-                source.TraceEvent(TraceEventType.Verbose, 7, string.Format("AutoRenew message ({0}) lock - stoped", id));
+                _trace.TraceEvent(TraceEventType.Verbose, 7, string.Format("AutoRenew message ({0}) lock - stoped", id));
                 task.Wait();
             };
         }

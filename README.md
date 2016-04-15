@@ -10,6 +10,15 @@ It supports
   3. Auto-renewing of `BrokeredMessage` based on its half life
   4. From a POCO make a `BrokeredMessage` and optionaly add in the POCO properties to the `BrokeredMessage` properties
 
+Tracing is accomplished by adding in
+
+    <switches>
+      <add name="Pandora.ServiceBusExtensionss" value="Verbose" />
+    </switches>
+    <sources>
+      <source name="Pandora.ServiceBusExtensions" />
+    </sources>
+
 ## Our use case
 
 We do a fair amount of push notifications between different systems via ServiceBus. We needed these kind of **macros** to avoid writing them over and over for all of our micro services.

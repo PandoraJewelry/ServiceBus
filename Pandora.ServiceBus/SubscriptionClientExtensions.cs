@@ -1,19 +1,22 @@
-﻿using Microsoft.ServiceBus.Messaging;
+﻿// Copyright (c) PandoraJewelry. All rights reserved.
+// Licensed under the MIT License. See License in the project root for license information.
+
+using Microsoft.ServiceBus.Messaging;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace Pandora.ServiceBusExtensions
+namespace Pandora.ServiceBus
 {
     public static class SubscriptionClientExtensions
     {
-        private static TraceSource source = new TraceSource(typeof(SubscriptionClientExtensions).FullName, SourceLevels.Error);
+        #region fields
+        private static TraceSource _trace = new TraceSource(Consts.TraceName, SourceLevels.Error); 
+        #endregion
 
         public static async Task<SubscriptionClient> DrainAsync(this SubscriptionClient client, TimeSpan ttl)
         {
-            source.TraceEvent(TraceEventType.Information, 4, "Draining subscription [{0}/{1}] - starting", client.TopicPath, client.Name);
+            _trace.TraceEvent(TraceEventType.Information, 4, "Draining subscription [{0}/{1}] - starting", client.TopicPath, client.Name);
 
             bool hadmessages = false;
 
@@ -31,7 +34,7 @@ namespace Pandora.ServiceBusExtensions
 
             } while (hadmessages);
 
-            source.TraceEvent(TraceEventType.Information, 4, "Draining subscription - done");
+            _trace.TraceEvent(TraceEventType.Information, 4, "Draining subscription - done");
 
             return client;
         }
