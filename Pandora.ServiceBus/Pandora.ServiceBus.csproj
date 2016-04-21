@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="BrokeredMessageExtensions.cs" />
     <Compile Include="Consts.cs" />
+    <Compile Include="ProcessExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SubscriptionClientExtensions.cs" />
   </ItemGroup>

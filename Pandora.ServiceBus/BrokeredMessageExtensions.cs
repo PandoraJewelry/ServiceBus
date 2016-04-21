@@ -6,9 +6,11 @@ using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace Pandora.ServiceBus
 {
@@ -20,54 +22,12 @@ namespace Pandora.ServiceBus
         private const string PlainTextType = "text/plain";
         #endregion
 
-        #region process async
-        public static async Task<bool> ProcessRequestAsync<T>(this BrokeredMessage message, Func<T, Task<bool>> callback)
-        {
-            return await message.ProcessRequestAsync(callback, async _ => true);
-        }
-        public static async Task<TResult> ProcessRequestAsync<T, TResult>(this BrokeredMessage message, Func<T, Task<TResult>> callback) where TResult : class
-        {
-            return await message.ProcessRequestAsync(callback, async p => p != null);
-        }
-        internal static async Task<TResult> ProcessRequestAsync<T, TResult>(this BrokeredMessage message, Func<T, Task<TResult>> callback, Func<TResult, Task<bool>> successdetect)
-        {
-            Action done = null;
-
-            try
-            {
-                done = message.AutoRenew();
-
-                _trace.TraceEvent(TraceEventType.Verbose, 1, string.Format("Start of Deseralise ({0}) processing.", message.MessageId));
-                var t = await message.DeseraliseAsync<T>();
-                _trace.TraceEvent(TraceEventType.Verbose, 2, "End of Deseralise processing.");
-
-                _trace.TraceEvent(TraceEventType.Verbose, 3, "Start of message processing.");
-                var result = await callback(t);
-                var success = await successdetect(result);
-                _trace.TraceEvent(TraceEventType.Verbose, 4, string.Format("End of message processing. {0}", success ? "Success" : "Errors Detected"));
-
-                if (!success)
-                    throw new ApplicationException("Process did not complete successfully");
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                /// log errors
-                _trace.TraceEvent(TraceEventType.Error, 1, string.Format("ProcessRequest ({0}) - {1}", message.MessageId, ex));
-                throw;
-            }
-            finally
-            {
-                if (done != null)
-                    done();
-            }
-        }
-        #endregion
-
         #region auto renew
         public static Action AutoRenew(this BrokeredMessage message)
         {
+            if (message == null)
+                throw new ArgumentNullException(nameof(message));
+
             var halflife = (int)((message.LockedUntilUtc - DateTime.Now.ToUniversalTime()).TotalMilliseconds / 2);
             var token = new CancellationTokenSource();
             var id = message.MessageId;
@@ -99,14 +59,17 @@ namespace Pandora.ServiceBus
 
         #region deseralize
         [Obsolete]
-        public static T Deseralisec<T>(this BrokeredMessage message)
+        public static T Deserialize<T>(this BrokeredMessage message)
         {
-            var tmp = message.DeseraliseAsync<T>();
+            var tmp = message.DeserializeAsync<T>();
             tmp.Wait();
             return tmp.Result;
         }
-        public static async Task<T> DeseraliseAsync<T>(this BrokeredMessage message)
+        public static async Task<T> DeserializeAsync<T>(this BrokeredMessage message)
         {
+            if (message == null)
+                throw new ArgumentNullException(nameof(message));
+
             if ((message.ContentType == JsonContentType) || (message.ContentType == PlainTextType))
             {
                 using (var stream = message.GetBody<Stream>())
@@ -129,11 +92,22 @@ namespace Pandora.ServiceBus
             tmp.Wait();
             return tmp.Result;
         }
-        public static async Task<BrokeredMessage> CreateMessageAsync<T>(this T item, bool propertyConversion = false)
+        public static async Task<BrokeredMessage> CreateMessageAsync<T>(this T item, bool propertyConversion = false, bool serializeAsJson = true)
         {
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
 
+            var msg = serializeAsJson ?
+                await CreateJsonMessageAsync(item) :
+                CreateBinaryMessageAsync(item);
+
+            if (propertyConversion)
+                PropertyConversion(msg, item);
+
+            return msg;
+        }
+        internal static async Task<BrokeredMessage> CreateJsonMessageAsync<T>(this T item)
+        {
             var stream = new MemoryStream();
             using (var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true))
             {
@@ -141,12 +115,20 @@ namespace Pandora.ServiceBus
                 await writer.FlushAsync();
                 stream.Position = 0;
 
-                var msg = new BrokeredMessage(stream, true) { ContentType = JsonContentType };
+                return new BrokeredMessage(stream, true) { ContentType = JsonContentType };
+            }
+        }
+        internal static BrokeredMessage CreateBinaryMessageAsync<T>(this T item)
+        {
+            var serializer = new DataContractSerializer(typeof(T));
 
-                if (propertyConversion)
-                    PropertyConversion(msg, item);
+            var stream = new MemoryStream();
+            using (var writer = XmlDictionaryWriter.CreateBinaryWriter(stream, null, null, false))
+            {
+                serializer.WriteObject(writer, item);
+                stream.Position = 0;
 
-                return msg;
+                return new BrokeredMessage(stream, true);
             }
         }
         private static void PropertyConversion<T>(BrokeredMessage message, T item)
