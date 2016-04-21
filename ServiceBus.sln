@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pandora.ServiceBus", "Pandora.ServiceBus\Pandora.ServiceBus.csproj", "{35F5EDD9-2E4B-4AA5-BB6C-8F4E4EC2EC8D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Quality", "Quality", "{DC8D17E1-05E7-403B-9015-94AF1F7C6D66}"
+	ProjectSection(SolutionItems) = preProject
+		CodeCoverage.Runsettings = CodeCoverage.Runsettings
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pandora.ServiceBus.Tests", "Pandora.ServiceBus.Tests\Pandora.ServiceBus.Tests.csproj", "{7FCE54BA-FC3D-4727-A510-6FAF7E9F2CF2}"
 EndProject
