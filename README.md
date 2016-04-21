@@ -10,14 +10,15 @@ It supports
   3. Auto-renewing of `BrokeredMessage` based on its half life
   4. From a POCO make a `BrokeredMessage` and optionaly add in the POCO properties to the `BrokeredMessage` properties
 
-Tracing is accomplished by adding in
+##Tracing
+Tracing can be turned on by adding in
 
-    <switches>
-      <add name="Pandora.ServiceBusExtensionss" value="Verbose" />
-    </switches>
-    <sources>
-      <source name="Pandora.ServiceBusExtensions" />
-    </sources>
+	<switches>
+	  <add name="Pandora.ServiceBusExtensions" value="Verbose" />
+	</switches>
+	<sources>
+	  <source name="Pandora.ServiceBusExtensions" />
+	</sources>
 
 ## Our use case
 
