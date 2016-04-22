@@ -110,6 +110,20 @@ namespace Pandora.ServiceBus.Tests
             Assert.AreEqual(expected.Baz, actual.Baz);
         }
         [TestMethod]
+        public async Task RoundTripLargeBinary()
+        {
+            var expected = new Foo1() { Bar = 2, Baz = new string('x', 10000) };
+
+            var msg = await expected.CreateMessageAsync(false, false);
+            var actual = await msg.DeserializeAsync<Foo1>();
+
+            Assert.IsNotNull(msg);
+            Assert.IsNull(msg.ContentType);
+            Assert.IsTrue(msg.IsBodyConsumed);
+            Assert.AreEqual(expected.Bar, actual.Bar);
+            Assert.AreEqual(expected.Baz, actual.Baz);
+        }
+        [TestMethod]
         [ExpectedException(typeof(InvalidDataContractException))]
         public async Task RoundTripCantSeraliseBinary()
         {

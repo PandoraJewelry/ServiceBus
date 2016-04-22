@@ -6,5 +6,7 @@ namespace Pandora.ServiceBus
     internal class Consts
     {
         public const string TraceName = "Pandora.ServiceBusExtensions";
+        public const string JsonContentType = "application/json";
+        public const string PlainTextType = "text/plain";
     }
 }

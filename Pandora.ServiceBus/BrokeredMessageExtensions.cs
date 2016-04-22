@@ -18,8 +18,6 @@ namespace Pandora.ServiceBus
     {
         #region fields
         private static TraceSource _trace = new TraceSource(Consts.TraceName, SourceLevels.Error);
-        private const string JsonContentType = "application/json";
-        private const string PlainTextType = "text/plain";
         #endregion
 
         #region auto renew
@@ -70,7 +68,7 @@ namespace Pandora.ServiceBus
             if (message == null)
                 throw new ArgumentNullException(nameof(message));
 
-            if ((message.ContentType == JsonContentType) || (message.ContentType == PlainTextType))
+            if ((message.ContentType == Consts.JsonContentType) || (message.ContentType == Consts.PlainTextType))
             {
                 using (var stream = message.GetBody<Stream>())
                 using (var reader = new StreamReader(stream))
@@ -115,7 +113,7 @@ namespace Pandora.ServiceBus
                 await writer.FlushAsync();
                 stream.Position = 0;
 
-                return new BrokeredMessage(stream, true) { ContentType = JsonContentType };
+                return new BrokeredMessage(stream, true) { ContentType = Consts.JsonContentType };
             }
         }
         internal static BrokeredMessage CreateBinaryMessageAsync<T>(this T item)
@@ -126,6 +124,7 @@ namespace Pandora.ServiceBus
             using (var writer = XmlDictionaryWriter.CreateBinaryWriter(stream, null, null, false))
             {
                 serializer.WriteObject(writer, item);
+                writer.Flush();
                 stream.Position = 0;
 
                 return new BrokeredMessage(stream, true);
