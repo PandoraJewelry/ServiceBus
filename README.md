@@ -26,7 +26,7 @@ We do a fair amount of push notifications between different systems via ServiceB
 
 ## Installation
 
-You can obtain it [through Nuget](https://www.nuget.org/packages/Pandora.ServiceBusExtensions/) with:
+You can obtain it [through Nuget][0] with:
 
     Install-Package Pandora.ServiceBusExtensions
 
@@ -35,4 +35,7 @@ Or **clone** this repo and reference it.
 ### Historical Note
 
 This was our first foray into open sourcing projects. The project's internal name was **Pandora.ServiceBusExtensions** so we kept the name when we moved the code to [GitHub](https://github.com/PandoraJewelry/ServiceBus). After examining other similar projects we determined to rename the project to **Pandora.ServiceBus** to mimic the Microsoft DLL name. We are maintaining the package name of **Pandora.ServiceBusExtensions** in difference to those already using it.
+
+[\\]: Refrences
+[0]: https://www.nuget.org/packages/Pandora.ServiceBusExtensions
 
